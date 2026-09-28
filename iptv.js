@@ -868,7 +868,9 @@
             var playlist = result[0];
             var params = result[1];
 
-            if (playlist && params) {
+            if (playlist && playlist.channels) playlist.channels.forEach(function (c) { if (c.id) TT.ids[c.id] = 1; });
+
+            if (playlist && params && playlist.tt_v === 1) {
               var time = {
                 'always': 0,
                 'hour': 1000 * 60 * 60,
@@ -881,6 +883,7 @@
             }
 
             var secuses = function secuses(result) {
+              result.tt_v = 1;
               DB.rewriteData('playlist', id, result)["finally"](function () {
                 if (params) params.update_time = Date.now();
                 Params.set(id, params)["finally"](resolve.bind(resolve, result));
@@ -891,13 +894,7 @@
               playlist ? resolve(playlist) : reject(e);
             };
 
-            if (params && params.loading == 'lampa' || data.custom) {
-              _this5[Lampa.Account.logged() ? 'm3u' : 'm3uClient'](data.url).then(secuses)["catch"](error);
-            } else {
-              _this5.get('playlist/' + id, true).then(secuses)["catch"](function () {
-                _this5.m3u(data.url).then(secuses)["catch"](error);
-              });
-            }
+            _this5.m3uClient(data.url).then(secuses)["catch"](error);
           })["catch"](function (e) {
             e.from_error = 'Playlist Function (Something went wrong)';
             reject(e);
