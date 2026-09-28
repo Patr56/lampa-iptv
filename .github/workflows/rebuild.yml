@@ -1,0 +1,43 @@
+name: Rebuild from upstream
+
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+  push:
+    paths: ['patch.py', '.github/workflows/rebuild.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch upstream plugin
+        run: |
+          for u in https://cub.red/plugin/iptv https://cub.best/plugin/iptv; do
+            if curl -fsSL --max-time 60 -o upstream.js "$u" && head -c 20 upstream.js | grep -q 'function'; then
+              echo "fetched $u"; exit 0
+            fi
+          done
+          echo "upstream unavailable"; exit 1
+
+      - name: Apply patches
+        run: python3 patch.py upstream.js iptv.new.js
+
+      - name: Syntax check
+        run: node --check iptv.new.js
+
+      - name: Publish if changed
+        run: |
+          mv upstream.js iptv.orig.js
+          mv iptv.new.js iptv.js
+          git add iptv.js iptv.orig.js
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Rebuild: upstream $(grep -o "version: '[0-9.]*'" iptv.orig.js | head -1)"
+          git push

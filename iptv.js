@@ -1,7 +1,8 @@
 (function () {
   'use strict';
+
+  console.log('TT', 'plugin TT 1.2.8 loaded');
   // --- tv.team fork: in-memory EPG store ---
-  console.log('TT', 'plugin v4 loaded');
   var TT = window.TT_EPG = window.TT_EPG || {
     url: 'https://epg.team/3.1.xml.gz',
     ids: {},
@@ -23,8 +24,6 @@
     swap: function () { if (Object.keys(this.next).length) this.cur = this.next; this.next = {}; },
     get: function (id) { return this.cur[id]; }
   };
-
-  'use strict';
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -867,8 +866,8 @@
         return new Promise(function (resolve, reject) {
           Promise.all([DB.getDataAnyCase('playlist', id), Params.get(id)]).then(function (result) {
             var playlist = result[0];
-            console.log('TT', 'playlist', id, 'cached=' + !!playlist, 'tt_v=' + (playlist && playlist.tt_v), 'custom=' + data.custom);
             var params = result[1];
+            console.log('TT', 'playlist', id, 'cached=' + !!playlist, 'tt_v=' + (playlist && playlist.tt_v), 'custom=' + data.custom);
 
             if (playlist && playlist.channels) playlist.channels.forEach(function (c) { if (c.id) TT.ids[c.id] = 1; });
 
@@ -3822,10 +3821,9 @@
     }, {
       key: "update",
       value: function update(status_elem) {
-        var url = Lampa.Storage.get('iptv_guide_url');
-        if (!url || /192\.168\.|\.tar\.gz$/.test(url)) url = TT.url;
+        var url = Lampa.Storage.get('iptv_guide_url') || TT.url;
 
-        if (Lampa.Storage.field('iptv_guide_custom') && url) {
+        if (url) {
           if (!window.iptv_guide_update_process) {
             window.iptv_guide_update_process = Parser.listener;
             var last_id = -1;
@@ -4022,7 +4020,7 @@
     Lampa.SettingsApi.addComponent({
       component: 'iptv',
       icon: "<svg height=\"36\" viewBox=\"0 0 38 36\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n            <rect x=\"2\" y=\"8\" width=\"34\" height=\"21\" rx=\"3\" stroke=\"white\" stroke-width=\"3\"/>\n            <line x1=\"13.0925\" y1=\"2.34874\" x2=\"16.3487\" y2=\"6.90754\" stroke=\"white\" stroke-width=\"3\" stroke-linecap=\"round\"/>\n            <line x1=\"1.5\" y1=\"-1.5\" x2=\"9.31665\" y2=\"-1.5\" transform=\"matrix(-0.757816 0.652468 0.652468 0.757816 26.197 2)\" stroke=\"white\" stroke-width=\"3\" stroke-linecap=\"round\"/>\n            <line x1=\"9.5\" y1=\"34.5\" x2=\"29.5\" y2=\"34.5\" stroke=\"white\" stroke-width=\"3\" stroke-linecap=\"round\"/>\n        </svg>",
-      name: 'IPTV TT v4'
+      name: 'IPTV TT 1.2.8'
     });
 
     if (Lampa.Manifest.app_digital >= 200) {
@@ -4905,7 +4903,7 @@
     var manifest = {
       type: 'video',
       version: '1.2.8',
-      name: 'IPTV TT v4',
+      name: 'IPTV TT 1.2.8',
       description: '',
       component: 'iptv',
       onMain: function onMain(data) {
@@ -4952,7 +4950,7 @@
     }
 
     function add() {
-      var button = $("<li class=\"menu__item selector\">\n            <div class=\"menu__ico\">\n                <svg height=\"36\" viewBox=\"0 0 38 36\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n                    <rect x=\"2\" y=\"8\" width=\"34\" height=\"21\" rx=\"3\" stroke=\"currentColor\" stroke-width=\"3\"/>\n                    <line x1=\"13.0925\" y1=\"2.34874\" x2=\"16.3487\" y2=\"6.90754\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\"/>\n                    <line x1=\"1.5\" y1=\"-1.5\" x2=\"9.31665\" y2=\"-1.5\" transform=\"matrix(-0.757816 0.652468 0.652468 0.757816 26.197 2)\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\"/>\n                    <line x1=\"9.5\" y1=\"34.5\" x2=\"29.5\" y2=\"34.5\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\"/>\n                </svg>\n            </div>\n            <div class=\"menu__text\">".concat(window.lampa_settings.iptv ? Lampa.Lang.translate('player_playlist') : 'IPTV TT v4', "</div>\n        </li>"));
+      var button = $("<li class=\"menu__item selector\">\n            <div class=\"menu__ico\">\n                <svg height=\"36\" viewBox=\"0 0 38 36\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n                    <rect x=\"2\" y=\"8\" width=\"34\" height=\"21\" rx=\"3\" stroke=\"currentColor\" stroke-width=\"3\"/>\n                    <line x1=\"13.0925\" y1=\"2.34874\" x2=\"16.3487\" y2=\"6.90754\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\"/>\n                    <line x1=\"1.5\" y1=\"-1.5\" x2=\"9.31665\" y2=\"-1.5\" transform=\"matrix(-0.757816 0.652468 0.652468 0.757816 26.197 2)\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\"/>\n                    <line x1=\"9.5\" y1=\"34.5\" x2=\"29.5\" y2=\"34.5\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\"/>\n                </svg>\n            </div>\n            <div class=\"menu__text\">".concat(window.lampa_settings.iptv ? Lampa.Lang.translate('player_playlist') : 'IPTV TT 1.2.8', "</div>\n        </li>"));
       button.on('hover:enter', function () {
         if (window.lampa_settings.iptv) {
           if (Lampa.Activity.active().component == 'iptv') return Lampa.Activity.active().activity.component.playlist();
@@ -4960,7 +4958,7 @@
 
         Lampa.Activity.push({
           url: '',
-          title: 'IPTV TT v4',
+          title: 'IPTV TT 1.2.8',
           component: 'iptv',
           page: 1
         });
