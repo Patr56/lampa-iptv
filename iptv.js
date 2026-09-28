@@ -933,6 +933,7 @@
           };
 
           var mem = tvg_id ? TT.get(tvg_id) : null;
+          console.log('TT', 'program', 'name=' + data.name, 'channel_id=' + data.channel_id, 'tvg=' + JSON.stringify(data.tvg), 'mem=' + (mem ? mem.length : 'none'), 'store=' + Object.keys(TT.cur).length, 'ids=' + Object.keys(TT.ids).length);
           if (mem && mem.length) return resolve(mem);
 
           if (tvg_id) {
@@ -3851,6 +3852,7 @@
             Parser.listener.follow('end', function (data) {
               TT.put(last_id, program);
               TT.swap();
+              console.log('TT', 'guide end', 'channels=' + Object.keys(data.channel).length, 'stored=' + Object.keys(TT.cur).length, 'ids=' + Object.keys(TT.ids).length);
               program = [];
               var count = Lampa.Arrays.getKeys(data.channel).length;
               Lampa.Storage.set('iptv_guide_updated_status', {
